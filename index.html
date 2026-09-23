@@ -36,6 +36,18 @@
     width: 100%;
     height: auto;
   }
+  @media (max-width: 768px) {
+    .hero {
+      height: 100vh;
+      height: 100dvh;
+    }
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+  }
   .overlay {
     position: absolute;
     top: 27.5%;
@@ -72,24 +84,38 @@
     top: 16px;
     left: 16px;
     z-index: 10;
-    background: rgba(30, 10, 60, 0.65);
-    border: 1px solid rgba(176, 107, 255, 0.7);
+    background: rgba(60, 10, 45, 0.75);
+    border: 2px solid #ff3fa6;
     color: var(--gold);
     border-radius: 999px;
     padding: 10px 18px;
     font-size: 0.95rem;
+    font-weight: 700;
     cursor: pointer;
     backdrop-filter: blur(4px);
-    box-shadow: 0 0 18px rgba(176, 107, 255, 0.4);
+    box-shadow: 0 0 18px rgba(255, 63, 166, 0.6);
   }
   .music-btn:hover {
-    background: rgba(60, 20, 100, 0.75);
+    background: rgba(90, 15, 65, 0.85);
+  }
+  .music-btn.pulse {
+    animation: musicPulse 1.2s ease-in-out infinite;
+  }
+  @keyframes musicPulse {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(255, 63, 166, 0.55);
+      border-color: rgba(255, 63, 166, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 30px 8px rgba(255, 63, 166, 0.95);
+      border-color: #ff8fd0;
+    }
   }
 </style>
 </head>
 <body>
 
-<button class="music-btn" id="musicBtn" onclick="toggleMusic()">🔇 עצור מוזיקה</button>
+<button class="music-btn pulse" id="musicBtn" onclick="toggleMusic()">🎵 נגן מוזיקה</button>
 <audio id="bgMusic" src="music.mp3" loop autoplay playsinline></audio>
 
 <div class="page">
@@ -133,9 +159,11 @@
 
   audio.addEventListener('play', function () {
     musicBtn.textContent = '🔇 עצור מוזיקה';
+    musicBtn.classList.remove('pulse');
   });
   audio.addEventListener('pause', function () {
     musicBtn.textContent = '🎵 נגן מוזיקה';
+    musicBtn.classList.add('pulse');
   });
 
   function toggleMusic() {
@@ -148,16 +176,20 @@
 
   // Most mobile browsers block autoplay with sound until the user
   // interacts with the page. If autoplay was blocked, start playback
-  // on the very first tap/click/key press anywhere on the page.
+  // on the very first tap/click/key press ANYWHERE OTHER THAN the
+  // music button itself (the button already handles its own click,
+  // and handling it here too caused a play/pause race that needed
+  // several taps to settle).
   audio.play().catch(function () {
-    function startOnFirstInteraction() {
+    function startOnFirstInteraction(e) {
+      if (e.target.closest('#musicBtn')) return;
       audio.play();
       ['pointerdown', 'touchstart', 'keydown'].forEach(function (evt) {
         document.removeEventListener(evt, startOnFirstInteraction);
       });
     }
     ['pointerdown', 'touchstart', 'keydown'].forEach(function (evt) {
-      document.addEventListener(evt, startOnFirstInteraction, { once: true });
+      document.addEventListener(evt, startOnFirstInteraction);
     });
   });
 </script>
