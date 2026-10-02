@@ -1,2 +1,8 @@
 .claude/
 Infected Mushroom- I Wish (Skazi Edit).mp3
+serve.js
+.env
+.env.*
+*.pem
+*.key
+node_modules/
